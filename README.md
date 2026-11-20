@@ -2,15 +2,17 @@
 
 Quinto builds slide decks written as Quarto files (.qmd). A deck holds the slides and their speaker notes. Quinto turns it into a .pptx, a live preview for editing, and a reveal.js page for presenting from the browser. All three show the same slides, built once by `quinto.build` with the helpers of `style.py` on the layouts of `template.pptx`.
 
-The slides have a spare, mostly monochrome style in the manner of a LaTeX document: text in Libertinus Serif, lines and figures drawn with matplotlib in a lightly hand-drawn manner, tables in booktabs style. Quinto was written for a university course, and this style is built in. [STYLE.md](STYLE.md) gives guidelines for slides in this style, for authors and for coding agents that review or write decks.
+## Styles
+
+A style is a way slides look and what goes on them. Quinto has one style so far, zeroclutter: spare and mostly monochrome, in the manner of a LaTeX document, with text in Libertinus Serif, lines and figures drawn with matplotlib in a lightly hand-drawn manner, and tables in booktabs style. Each slide shows one thing, and the explanation is in the speaker notes. The helpers of `style.py` draw in this style. Its guidelines, for authors and for coding agents that review or write decks, are in [styles/zeroclutter.md](styles/zeroclutter.md). Other styles may be added later.
 
 ## Install
 
 Quinto has two parts: a Python package, which builds the decks, and a Quarto extension, which lets Quarto present them with reveal.js.
 
 ```sh
-pip install git+https://github.com/gchrupala/quinto@v0.1.1   # the package and the quinto command
-quarto add gchrupala/quinto@v0.1.1                            # the extension, run in the directory of the decks
+pip install git+https://github.com/gchrupala/quinto@v0.1.2   # the package and the quinto command
+quarto add gchrupala/quinto@v0.1.2                            # the extension, run in the directory of the decks
 ```
 
 `quarto add` copies the extension to `_extensions/quinto/`, which is meant to be committed with the decks. Install the same version of both.

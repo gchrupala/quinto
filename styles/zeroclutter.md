@@ -1,8 +1,10 @@
-# Slide style
+# zeroclutter
 
-Guidelines for decks made with Quinto. The visual style is the default of `style.py`; the other guidelines are about what goes on a slide and in its notes. A project can add its own rules, such as the length of a deck, how often to ask the audience a question, or who the notes are for.
+zeroclutter is a style for Quinto decks: spare and mostly monochrome, in the manner of a well-made LaTeX document. Each slide shows one thing, as a figure, a formula, a short prompt or a question, and the explanation is in the speaker notes. It suits talks and lectures whose slides are also read afterwards, with their notes, as a handout.
 
-When asked to check, review or design a deck, apply all of the following, slide by slide.
+The visual part of the style is what `style.py` draws by default. The other guidelines are about what goes on a slide and in its notes. A project can add its own rules, such as the length of a deck, how often to ask the audience a question, or who the notes are written for.
+
+When asked to check, review or design a deck in this style, apply all of the following, slide by slide.
 
 ## Layout
 
@@ -22,16 +24,12 @@ Spare, in the manner of a well-made LaTeX document rather than a PowerPoint temp
 
 ## Examples and visuals
 
-Use concrete, widely recognizable examples whose point is obvious, and replace textbook examples that are obscure or weak; do not follow a source slavishly. Keep one running example across related slides rather than a new one on each. To show what a model has learned, use new sentences, not famous ones it has likely seen in training.
+Use concrete, widely recognizable examples whose point is obvious, and replace examples from the sources that are obscure or weak; do not follow a source slavishly. Keep one running example across related slides rather than a new one on each. To show what a model has learned, use new sentences, not famous ones it has likely seen in training.
 
 Show concepts explicitly as objects (dots, boxes, tokens, code in a monospace font) rather than through counts, columns and labels, and avoid redundant devices that say the same thing twice. Icons and symbols must stand for something specific, never decorate. The element under discussion must stand out on a weak projector: accent colour together with bold type or thicker lines. An animation changes one thing per frame and marks what changed.
 
 ## Speaker notes
 
-Speaker notes work as lecture notes. They can be narrative and contain details, but they should still be fairly concise, and they should fit in the notes box at a legible font size (the preview marks notes that overflow). Use simple, clear language, and explain technical terms when they are used.
+The speaker notes carry the explanation, so that the deck can be read without the talk. They can be narrative and contain details, but they should still be fairly concise, and they should fit in the notes box at a legible font size (the preview marks notes that overflow). Use simple, clear language, and explain technical terms when they are used.
 
-Stick to the content being taught: no meta commentary about the talk (for example "The last part of today: agents" or "the next slide shows"), and no remarks on the state of the sources. Do not repeat what the slide body or a neighbouring slide already says, and define a term before it is first used. Give a reference only when citing a specific passage or using an example, figure or numbers from a source, never just because a section covers the topic; say when numbers are made up.
-
-## Factual correctness
-
-Verify technical claims, numbers, and reproduced figures and formulas against the actual cited source (paper, textbook) rather than from memory. Fetch the source (for example the arXiv PDF) when a claim is specific enough to get wrong.
+Stick to the content: no meta commentary about the talk (for example "The last part of today: agents" or "the next slide shows"). Do not repeat what the slide body or a neighbouring slide already says, and define a term before it is first used. Give a reference only when citing a specific passage or using an example, figure or numbers from a source, never just because a section covers the topic; say when numbers are made up.
