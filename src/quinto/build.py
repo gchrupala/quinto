@@ -103,6 +103,7 @@ def meta_text(v):
 
 LINE = style.STYLE.LINE  # line height in em, as in tohtml.py
 BODY, QUESTION, TITLE = style.STYLE.BODY, style.STYLE.QUESTION, style.STYLE.TITLE
+TITLE_SLIDE = style.STYLE.TITLE_SLIDE  # sizes of title, subtitle and author on the title slide
 TABLE, TABLE_HEADER, ROW = style.STYLE.TABLE, style.STYLE.TABLE_HEADER, style.STYLE.ROW
 ns = {"__name__": "__deck__"}
 cells = 0
@@ -225,13 +226,56 @@ def markdown_slide(title, blocks):
 
 # ── the deck ────────────────────────────────────────────────────────────────
 
+def balanced_width(text, size):
+    """The narrowest width, up to TEXT_W, at which text takes as few lines as at TEXT_W, so that a
+    title over two lines breaks into lines of similar length (as text-wrap: balance)."""
+    n, w = line_count([(text, {})], size, TEXT_W), TEXT_W
+    while n > 1 and w > 1 and line_count([(text, {})], size, w - 0.1) == n:
+        w -= 0.1
+    return w + 0.05  # a little slack for PowerPoint and the browser
+
+
+def place(shape, y, h, w=TEXT_W):
+    """Put a text shape of width w, centred on the slide, from y down for h inches, with its text at
+    the top and no inner margins."""
+    shape.left, shape.top, shape.width, shape.height = Inches((W - w) / 2), Inches(y), Inches(w), Inches(h)
+    tf = shape.text_frame
+    tf.text = ""
+    tf.vertical_anchor = MSO_ANCHOR.TOP
+    for side in ("left", "right", "top", "bottom"):
+        setattr(tf, f"margin_{side}", 0)
+    return tf
+
+
+def title_slide(meta):
+    """The title slide, laid out as the title block of a LaTeX article: the title, then the subtitle
+    and the author, centred together as one block a little above the middle of the slide. It has
+    no slide number."""
+    s = new("TITLE")
+    ph = {str(p.placeholder_format.type).split()[0]: p for p in s.placeholders}
+    if "SLIDE_NUMBER" in ph:
+        ph["SLIDE_NUMBER"]._element.getparent().remove(ph["SLIDE_NUMBER"]._element)
+    title, sub, author = (meta_text(meta.get(k)) for k in ("title", "subtitle", "author"))
+    blocks = [(title, TITLE_SLIDE[0], INK, 0)]  # text, size, colour, space above in inches
+    if sub:
+        blocks.append((sub, TITLE_SLIDE[1], INK, 0.45))
+    if author:
+        blocks.append((author, TITLE_SLIDE[2], GREY, 0.2 if sub else 0.5))
+    heights = [line_count([(text, {})], size, TEXT_W) * size * LINE / 72 for text, size, _, _ in blocks]
+    y = (H - sum(heights) - sum(b[3] for b in blocks)) / 2 - 0.3  # optical centre, above the middle
+    shapes = [ph["TITLE"], ph.get("SUBTITLE")]
+    for i, ((text, size, color, space), h) in enumerate(zip(blocks, heights)):
+        y += space
+        shape = shapes[i] if i < 2 and shapes[i] is not None else s.shapes.add_textbox(0, 0, 0, 0)
+        fill_text(place(shape, y, h, balanced_width(text, size)), [text], size, color=color, align="c")
+        y += h
+    if len(blocks) == 1 and "SUBTITLE" in ph:  # no subtitle or author: drop the empty placeholder
+        ph["SUBTITLE"]._element.getparent().remove(ph["SUBTITLE"]._element)
+    return s
+
+
 meta = doc["meta"]
-s = new("TITLE")
-ph = {str(p.placeholder_format.type).split()[0]: p for p in s.placeholders}
-ph["TITLE"].text_frame.text = ""
-fill_text(ph["TITLE"].text_frame, [meta_text(meta.get("title"))], 44, align="c")
-fill_text(ph["SUBTITLE"].text_frame, [t for t in (meta_text(meta.get("subtitle")), meta_text(meta.get("author"))) if t],
-          24, align="c")
+title_slide(meta)
 
 sections, setup = [], []
 for b in doc["blocks"]:

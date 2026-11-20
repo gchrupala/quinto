@@ -45,6 +45,7 @@ LATEX_PREAMBLE = r"\usepackage{amsmath}\usepackage{libertinus}\usepackage{libert
 # Sizes in pt: Markdown slides (body text, questions, titles, tables) and speaker notes; ROW is the
 # height of a table row on Markdown slides, in inches.
 BODY, QUESTION, TITLE, TABLE, TABLE_HEADER, ROW = 24, 36, 40, 28, 20, 0.6
+TITLE_SLIDE = (44, 28, 24)  # title slide: title, subtitle, author
 NOTES_SIZE, NOTES_SPACE = 16, 5  # speaker notes: font size and space after each paragraph
 
 # Drawings: matplotlib sketch params, amplitude (px at 100 dpi), wavelength, randomness; and the
