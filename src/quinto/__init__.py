@@ -10,6 +10,6 @@ import numpy as np  # noqa: F401  (for the cells)
 
 from .style import *  # noqa: E402,F401,F403
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 R = {"color": ACCENT}  # noqa: F405
