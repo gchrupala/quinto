@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quinto"
+version = "0.1.0"
+description = "Slide decks written in Quarto, drawn in Python, built as .pptx, with a live preview and a reveal.js version"
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Grzegorz Chrupała" }]
+requires-python = ">=3.10"
+dependencies = [
+    "python-pptx>=1.0",
+    "lxml",
+    "matplotlib>=3.8",
+    "numpy",
+    "Pillow",
+    "markdown-it-py",
+]
+
+[project.optional-dependencies]
+quarto = ["quarto-cli"]
+
+[project.scripts]
+quinto = "quinto.cli:main"
+
+[tool.setuptools.package-data]
+quinto = ["template.pptx", "install_fonts.sh"]

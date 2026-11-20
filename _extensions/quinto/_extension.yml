@@ -1,0 +1,18 @@
+title: Quinto
+author: Grzegorz Chrupała
+version: 0.1.0
+quarto-required: ">=1.4.0"
+contributes:
+  formats:
+    revealjs:
+      # the slide size of template.pptx (11.02 × 6.20 in at 96 px per inch)
+      width: 1058
+      height: 595
+      margin: 0
+      center: true
+      controls: false
+      progress: false
+      menu: false
+      css: slides.css
+      filters:
+        - quinto.lua
