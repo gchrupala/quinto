@@ -14,7 +14,7 @@ Then open http://localhost:8001 in a browser or in VS Code (Simple Browser: Show
 The .pptx itself is written by build.py: quinto pptx 01.
 """
 import glob, http.server, json, os, subprocess, sys, threading, time, urllib.parse
-from quinto import notesfile, qmdfile
+from quinto import notesfile, qmdfile, styles
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 QMD = qmdfile.find(sys.argv[1])
@@ -24,17 +24,15 @@ DECK = QMD
 BUILD = [sys.executable, "-m", "quinto.build", QMD]
 SCRIPTS = [os.path.join(HERE, f) for f in ("build.py", "__init__.py", "qmdfile.py", "style.py", "tohtml.py")]
 OUT = os.path.join(qmdfile.workdir(QMD), "preview", NN)
-FONTS = os.path.expanduser("~/.local/share/fonts/libertinus/")
+STYLE = styles.load(styles.spec(QMD))  # its serif is served to the page from its files
+FONTS = STYLE.SERIF_DIR
 lock = threading.Lock()
 
 PAGE = """<!doctype html>
 <html><head><meta charset="utf-8"><title>Deck %s preview</title>
 <style>
 /* the font files themselves, not local(): Firefox matches "Libertinus Serif Italic" to SemiBold Italic */
-@font-face { font-family: "Libertinus Serif"; src: url(fonts/LibertinusSerif-Regular.ttf); }
-@font-face { font-family: "Libertinus Serif"; font-style: italic; src: url(fonts/LibertinusSerif-Italic.ttf); }
-@font-face { font-family: "Libertinus Serif"; font-weight: bold; src: url(fonts/LibertinusSerif-Bold.ttf); }
-@font-face { font-family: "Libertinus Serif"; font-weight: bold; font-style: italic; src: url(fonts/LibertinusSerif-BoldItalic.ttf); }
+@FONT-FACES@
 body { margin: 0; padding: 12px 16px; background: #eee; font: 15px/1.4 sans-serif; color: #1a1a1a; }
 body.shot { padding: 0; background: #fff; }
 header { height: 24px; color: #707070; }
@@ -449,7 +447,11 @@ if __name__ == "__main__":
     for old in glob.glob(os.path.join(OUT, "slide-*.png")):  # pages rendered by earlier versions
         os.remove(old)
     with open(os.path.join(OUT, "index.html"), "w") as f:
-        f.write(PAGE % NN)
+        faces = "\n".join(
+            f'@font-face {{ font-family: "{STYLE.SERIF}";{" font-weight: bold;" if bold else ""}'
+            f'{" font-style: italic;" if italic else ""} src: url(fonts/{name}); }}'
+            for (bold, italic), name in sorted(STYLE.SERIF_FILES.items()))
+        f.write((PAGE % NN).replace("@FONT-FACES@", faces).replace('"Libertinus Serif"', f'"{STYLE.SERIF}"'))
     threading.Thread(target=watch, daemon=True).start()
     print(f"preview of deck {NN} at http://localhost:{PORT}", flush=True)
     http.server.ThreadingHTTPServer(("localhost", PORT), Handler).serve_forever()

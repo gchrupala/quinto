@@ -2,7 +2,7 @@
 
 zeroclutter is a style for Quinto decks: spare and mostly monochrome, in the manner of a well-made LaTeX document. Each slide shows one thing, as a figure, a formula, a short prompt or a question, and the explanation is in the speaker notes. It suits talks and lectures whose slides are also read afterwards, with their notes, as a handout.
 
-The visual part of the style is what `style.py` draws by default. The other guidelines are about what goes on a slide and in its notes. A project can add its own rules, such as the length of a deck, how often to ask the audience a question, or who the notes are written for.
+A deck chooses it with `quinto: style: zeroclutter` in its YAML header; it is also the style of a deck that chooses none. The visual part of the style is set in `src/quinto/styles/zeroclutter.py`, and `style.py` draws with these settings. The other guidelines are about what goes on a slide and in its notes. A project can add its own rules, such as the length of a deck, how often to ask the audience a question, or who the notes are written for.
 
 When asked to check, review or design a deck in this style, apply all of the following, slide by slide.
 

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Install the fonts the deck tools expect: Libertinus Serif, IBM Plex Mono and the monochrome Noto Emoji,
+# Install the fonts of the style zeroclutter: Libertinus Serif, IBM Plex Mono and the monochrome Noto Emoji,
 # all from the Google Fonts repository, into ~/.local/share/fonts.
 set -e
 BASE=https://raw.githubusercontent.com/google/fonts/main/ofl

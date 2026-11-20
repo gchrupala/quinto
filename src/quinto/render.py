@@ -6,7 +6,7 @@ Writes _quinto/preview/NN/pptx/slide-XX.png. Needs LibreOffice (soffice) and pdf
 LibreOffice runs headless with its own profile, so an open LibreOffice window does not interfere.
 """
 import glob, os, subprocess, sys, tempfile
-from quinto import fonts, qmdfile
+from quinto import fonts, qmdfile, styles
 
 qmd = qmdfile.find(sys.argv[1])
 NN = qmdfile.number(qmd)
@@ -16,7 +16,7 @@ PROFILE = "file://" + os.path.join(qmdfile.workdir(qmd), ".lo-profile")
 PDF_FILTER = 'pdf:impress_pdf_Export:{"ExportNotesPages":{"type":"boolean","value":"true"},' \
              '"ExportOnlyNotesPages":{"type":"boolean","value":"true"}}'
 
-fonts.check()
+fonts.check(styles.load(styles.spec(qmd)))
 subprocess.run([sys.executable, "-m", "quinto.build", qmd], check=True)
 deck = os.path.splitext(qmd)[0] + ".pptx"
 os.makedirs(OUT, exist_ok=True)

@@ -10,8 +10,8 @@ COMMANDS = {  # name: (module, arguments, description)
     "pdf": ("pdf", "DECK...", "write the .pptx and export PDFs of the slides and the notes pages"),
     "render": ("render", "DECK", "render the notes pages of the .pptx through LibreOffice"),
     "shot": ("shot", "DECK [SLIDES]", "screenshots of preview pages (the preview must be running)"),
-    "fonts": ("fonts", "", "check that the fonts are installed"),
-    "install-fonts": (None, "", "download the fonts to ~/.local/share/fonts"),
+    "fonts": ("fonts", "[DECK]", "check that the fonts of the style of a deck are installed"),
+    "install-fonts": (None, "", "download the fonts of zeroclutter to ~/.local/share/fonts"),
 }
 
 

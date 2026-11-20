@@ -1,10 +1,8 @@
 /* reveal.js: every slide is HTML made by tohtml.py from the .pptx (see quinto.lua), with its shapes
    positioned in pt within the whole slide, and the size, colour and spacing of the text set inline.
-   The slide is 1058 × 595 px = 793.4 × 446.4 pt, as in the .pptx. */
-@import url("https://fonts.googleapis.com/css2?family=Libertinus+Serif:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+   The slide is 1058 × 595 px = 793.4 × 446.4 pt, as in the .pptx. The fonts and colours of the
+   page come from the style of the deck (CSS in its module), which quinto.lua adds to the page. */
 
-.reveal-viewport { background: #fff; }
-.reveal { font-family: "Libertinus Serif", serif; color: #1a1a1a; }
 .reveal .slides section { padding: 0; }
 .reveal .slides section > h2:empty { display: none; }
 

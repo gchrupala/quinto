@@ -4,15 +4,24 @@ Quinto builds slide decks written as Quarto files (.qmd). A deck holds the slide
 
 ## Styles
 
-A style is a way slides look and what goes on them. Quinto has one style so far, zeroclutter: spare and mostly monochrome, in the manner of a LaTeX document, with text in Libertinus Serif, lines and figures drawn with matplotlib in a lightly hand-drawn manner, and tables in booktabs style. Each slide shows one thing, and the explanation is in the speaker notes. The helpers of `style.py` draw in this style. Its guidelines, for authors and for coding agents that review or write decks, are in [styles/zeroclutter.md](styles/zeroclutter.md). Other styles may be added later.
+A style is a way slides look and what goes on them. A deck chooses its style in its YAML header:
+
+```yaml
+quinto:
+  style: zeroclutter
+```
+
+Without this setting, a deck is in zeroclutter. Quinto has one style so far, zeroclutter: spare and mostly monochrome, in the manner of a LaTeX document, with text in Libertinus Serif, lines and figures drawn with matplotlib in a lightly hand-drawn manner, and tables in booktabs style. Each slide shows one thing, and the explanation is in the speaker notes. The helpers of `style.py` draw in this style. Its guidelines, for authors and for coding agents that review or write decks, are in [styles/zeroclutter.md](styles/zeroclutter.md). Other styles may be added later.
+
+In the code, a style is a module of settings in `src/quinto/styles/`: colours, fonts and their files, sizes, the line height, the template, the matplotlib settings and the CSS for reveal.js. The helpers of `style.py`, the Markdown slides, the preview, the reveal.js page and `quinto fonts` take these settings from the style of the deck. A project can also have a style of its own: give the path of a Python file instead of a name (`style: mystyle.py`, relative to the .qmd). The file can start from zeroclutter and redefine what differs; see `styles/zeroclutter.py`.
 
 ## Install
 
 Quinto has two parts: a Python package, which builds the decks, and a Quarto extension, which lets Quarto present them with reveal.js.
 
 ```sh
-pip install git+https://github.com/gchrupala/quinto@v0.1.2   # the package and the quinto command
-quarto add gchrupala/quinto@v0.1.2                            # the extension, run in the directory of the decks
+pip install git+https://github.com/gchrupala/quinto@v0.2.0   # the package and the quinto command
+quarto add gchrupala/quinto@v0.2.0                            # the extension, run in the directory of the decks
 ```
 
 `quarto add` copies the extension to `_extensions/quinto/`, which is meant to be committed with the decks. Install the same version of both.
@@ -20,11 +29,11 @@ quarto add gchrupala/quinto@v0.1.2                            # the extension, r
 Other requirements:
 
 - Quarto (<https://quarto.org>, or the Python package `quarto-cli`: `pip install "quinto[quarto] @ git+..."`), tested with 1.10.19. Its bundled pandoc parses the .qmd.
-- Fonts: four fonts are required, listed in `fonts.py`. `quinto fonts` checks that they are installed.
+- Fonts: zeroclutter needs four fonts, listed in its module (`FONTS`). `quinto fonts [DECK]` checks that the fonts of the style of a deck are installed.
   - Libertinus Serif (all text), IBM Plex Mono (code) and the monochrome Noto Emoji (icons): `quinto install-fonts` downloads them from Google Fonts to `~/.local/share/fonts/libertinus/`, `~/.local/share/fonts/ibmplexmono/` and `~/.local/share/fonts/notoemoji/NotoEmoji.ttf`. Quinto reads Libertinus Serif and Noto Emoji from these paths to measure text and draw figures.
   - Noto Serif CJK SC, for Chinese: Debian/Ubuntu package `fonts-noto-cjk`.
   - The .pptx only names the fonts, so LibreOffice or PowerPoint substitutes another font, without a warning, for any font that is missing. `quinto render` and `quinto pdf` therefore stop if a font is missing.
-- Formulas (`formula()` in `style.py`) are set by LaTeX through matplotlib, in the Libertinus math fonts: a TeX installation with `latex`, `dvipng` and the packages amsmath, libertinus and libertinust1math (on Debian/Ubuntu: `texlive-latex-extra`, `texlive-fonts-extra`, `dvipng`).
+- Formulas (`formula()` in `style.py`) are set by LaTeX through matplotlib, with the preamble of the style. zeroclutter uses the Libertinus math fonts, which need a TeX installation with `latex`, `dvipng` and the packages amsmath, libertinus and libertinust1math (on Debian/Ubuntu: `texlive-latex-extra`, `texlive-fonts-extra`, `dvipng`).
 - To check the real deck and export PDFs in LibreOffice (`quinto render`, `quinto pdf`): LibreOffice (`soffice`) and `pdftoppm` (package `poppler-utils`). Screenshots of the preview (`quinto shot`) need Google Chrome or Chromium.
 
 ## Commands
@@ -38,14 +47,14 @@ Run `quinto` in the directory of the decks. A deck is named by its number, for e
 | `quinto pdf 00 01 02` | write the .pptx of each deck and export PDFs of the slides and of the notes pages |
 | `quinto render 01` | write the .pptx and render its notes pages through LibreOffice |
 | `quinto shot 01 [3 5-7]` | screenshots of preview pages, with the preview running |
-| `quinto fonts` | check that the fonts are installed |
-| `quinto install-fonts` | download the fonts |
+| `quinto fonts [01]` | check that the fonts of the style of a deck are installed |
+| `quinto install-fonts` | download the fonts of zeroclutter |
 
 Generated files go to `_quinto/` next to the .qmd (or to the directory in `QUINTO_DIR`): the figure cache in `fig/`, the preview of each deck in `preview/NN/`, and the profiles of LibreOffice and Chrome. Add `_quinto/` and `_deck/` to `.gitignore`.
 
 ## The .qmd file
 
-- A YAML header gives the title, an optional subtitle and the author, which make the title slide, and the format: `format: quinto-revealjs` and `engine: markdown`.
+- A YAML header gives the title, an optional subtitle and the author, which make the title slide, the format (`format: quinto-revealjs` and `engine: markdown`) and optionally the style (`quinto: style: ...`).
 - A Python cell before the first slide (`from quinto import *`) is the setup: it imports the helpers of `style.py` and defines what several slides use. The cells run with the directory of the .qmd as the current directory, so paths can be relative to it.
 - Each `## {#key}` starts a slide. The key names the slide; the preview and the .pptx use it to match notes to slides.
 - A slide is either a Python cell or Markdown. A cell draws the slide with the helpers of `style.py`: `s = new()`, then `tb`, `arrow`, `pic`, `table` and so on. All cells share one namespace, in order. Markdown slides are laid out by `build.py`: a title, paragraphs, `::: question` and tables (booktabs), centred together on the slide, with `[text]{.accent}` and `[text]{.grey}` for colour. Only this small set of Markdown is supported; anything else is an error. To centre a Markdown slide, its paragraph heights are estimated from the width of the words, so the text can sit slightly off centre when PowerPoint or the browser breaks a line differently.
@@ -60,6 +69,8 @@ title: "A deck"
 author: "A. Author"
 engine: markdown
 format: quinto-revealjs
+quinto:
+  style: zeroclutter
 ---
 
 ```{python}
@@ -100,13 +111,13 @@ Line breaks in the browser are close to those in PowerPoint, but not always iden
 - **PowerPoint:** `quinto pptx 01` writes `01_name.pptx`. It replaces the PowerPoint output of Quarto: the pandoc bundled with Quarto parses the .qmd, and `build.py` runs the cells, lays out the Markdown slides and adds the notes.
 - **PDF:** `quinto pdf 00 01 02` writes the .pptx of each deck and exports it through LibreOffice to two PDFs: `01_name.pdf` with the slides, and `01_name_notes.pdf` with the notes pages (each slide with its speaker notes). An animated GIF shows its last frame in the PDFs; the .pptx keeps the animation.
 - **Checking the .pptx:** `quinto render 01` writes the .pptx and renders its notes pages through LibreOffice to `_quinto/preview/01/pptx/`. `quinto shot 01 [3 5-7]` takes screenshots of preview pages to `_quinto/preview/01/slide-NN.png`, with the preview server running.
-- **reveal.js:** `quarto preview 01_name.qmd` serves the deck for presenting from the browser (`quarto render` writes the HTML). The filter of the extension, `quinto.lua`, runs `quinto.build`, which writes the slides as HTML to `_deck/`, and puts that HTML in place of the content of each slide, so the slides look as in the .pptx. Quarto provides the page, the moving between slides and the speaker view (press S). The cells do not run in Jupyter. `slides.css` holds only what the positioned HTML needs. Python is `python3`, or the interpreter in `QUARTO_PYTHON`; Quinto must be installed in it.
+- **reveal.js:** `quarto preview 01_name.qmd` serves the deck for presenting from the browser (`quarto render` writes the HTML). The filter of the extension, `quinto.lua`, runs `quinto.build`, which writes the slides as HTML to `_deck/`, and puts that HTML in place of the content of each slide, so the slides look as in the .pptx. It also adds the CSS of the style (fonts and colours). Quarto provides the page, the moving between slides and the speaker view (press S). The cells do not run in Jupyter. `slides.css` holds only what the positioned HTML needs. Python is `python3`, or the interpreter in `QUARTO_PYTHON`; Quinto must be installed in it.
 
 ## Figures
 
 `audio()` in `style.py` puts a sound clip on a slide as a loudspeaker icon; in the preview and in reveal.js, clicking the icon plays it. An animation is an animated GIF, drawn like any other figure with `figure(draw, ext="gif")`. `icon()` draws monochrome Noto Emoji.
 
-Figures are cached in `_quinto/fig/`. A figure is drawn again only when its inputs change. The helpers in `style.py` (`arrow`, `icon`, `dep_tree`) know their inputs. A figure drawn in a cell goes in a function that saves it to the path it is given, called through `figure`: `pic(s, figure(draw_tree), ...)`. The key of such a figure is the source of the function, the values it reads from the cells, and the contents of any input files listed with `files=[...]`. Every key also includes `style.py`, so a change there redraws all figures.
+Figures are cached in `_quinto/fig/`. A figure is drawn again only when its inputs change. The helpers in `style.py` (`arrow`, `icon`, `dep_tree`) know their inputs. A figure drawn in a cell goes in a function that saves it to the path it is given, called through `figure`: `pic(s, figure(draw_tree), ...)`. The key of such a figure is the source of the function, the values it reads from the cells, and the contents of any input files listed with `files=[...]`. Every key also includes `style.py` and the settings of the style, so a change there redraws all figures.
 
 ## Development
 

@@ -3,8 +3,8 @@
 Quarto lays out none of the slides itself. This filter runs quinto.build with DECK_HTML set, which
 builds the deck as for the .pptx and writes each slide as absolutely positioned HTML (tohtml.py), as
 for the live preview. It then replaces the content of each slide with that HTML, and its notes with
-the notes as rendered by notesfile.py. What Quarto still does: the reveal.js page, moving between
-slides and the speaker view.
+the notes as rendered by notesfile.py, and adds the CSS of the style of the deck (fonts and colours).
+What Quarto still does: the reveal.js page, moving between slides and the speaker view.
 
 The title slide is built by quinto.build as well, so the title is taken out of the metadata, where it
 would make Quarto add a title slide of its own; it stays the title of the page.
@@ -45,6 +45,9 @@ function Pandoc(doc)
     error("quinto.build failed: " .. cmd)
   end
   local slides = read_json(pandoc.path.join({ out, "slides.json" })).slides
+  local f = assert(io.open(pandoc.path.join({ out, "style.css" }), "r"))
+  local css = f:read("a")
+  f:close()
   local notes = read_json(pandoc.path.join({ out, "notes.json" }))
 
   local function placed(html)
@@ -73,6 +76,16 @@ function Pandoc(doc)
       blocks:insert(pandoc.Div({ pandoc.RawBlock("html", notes[key] or "") }, b.attr))
     end
   end
+
+  -- the fonts and colours of the style of the deck
+  local includes = doc.meta["header-includes"]
+  if includes == nil then
+    includes = pandoc.List({})
+  elseif pandoc.utils.type(includes) ~= "List" then
+    includes = pandoc.List({ includes })
+  end
+  includes:insert(pandoc.RawBlock("html", "<style>\n" .. css .. "</style>"))
+  doc.meta["header-includes"] = includes
 
   doc.meta.pagetitle = doc.meta.pagetitle or doc.meta.title
   doc.meta.title = nil

@@ -3,13 +3,13 @@ and the notes pages (each slide with its speaker notes).
 
 Usage: quinto pdf 00 01 02
 Writes NN_name.pdf and NN_name_notes.pdf next to each deck. Needs LibreOffice (soffice) and the fonts
-in fonts.py. LibreOffice runs headless with its own profile, so an open LibreOffice window does not
+of the style of each deck. LibreOffice runs headless with its own profile, so an open LibreOffice window does not
 interfere. A PDF cannot show an animation, and LibreOffice would show the first frame of each animated
 GIF; the PDFs show the last frame instead, which holds the complete figure. The .pptx keeps its animations.
 """
 import io, os, subprocess, sys, tempfile, zipfile
 from PIL import Image
-from quinto import fonts, qmdfile
+from quinto import fonts, qmdfile, styles
 
 # Explicit settings, whatever those of the user's own LibreOffice profile.
 FILTERS = {
@@ -35,9 +35,9 @@ def last_frames(src, dst):
             zout.writestr(item, data)
 
 
-fonts.check()
 for nn in sys.argv[1:]:
     qmd = qmdfile.find(nn)
+    fonts.check(styles.load(styles.spec(qmd)))
     subprocess.run([sys.executable, "-m", "quinto.build", qmd], check=True)
     profile = "file://" + os.path.join(qmdfile.workdir(qmd), ".lo-profile")
     base = os.path.splitext(qmd)[0]

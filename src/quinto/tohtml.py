@@ -11,9 +11,11 @@ the real deck through LibreOffice as a final check.
 import hashlib, html, json, os
 from pptx.oxml.ns import qn
 
-LINE = 1.19  # single line spacing, in em: measured in LibreOffice for Libertinus Serif (PowerPoint: about 1.2)
+from .style import STYLE
+
+LINE = STYLE.LINE  # single line spacing, in em
 DEFAULT_SIZE = 18  # pt, when no size is set anywhere
-SERIF, MONO, CJK = "Libertinus Serif", "IBM Plex Mono", "Noto Serif CJK SC"
+SERIF, MONO, CJK = STYLE.SERIF, STYLE.MONO, STYLE.CJK
 
 
 def pt(emu):

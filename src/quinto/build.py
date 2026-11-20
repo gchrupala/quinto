@@ -21,12 +21,13 @@ version (quinto.lua) both show these slides, so all three outputs share one layo
 """
 import json, linecache, os, subprocess, sys
 
-from quinto import qmdfile
+from quinto import qmdfile, styles
 
 QMD = qmdfile.find(sys.argv[1])
 DIR = os.path.dirname(QMD)
 BASE = os.path.splitext(QMD)[0]
 os.environ["QUINTO_DIR"] = qmdfile.workdir(QMD)  # before style is imported: the figure cache is there
+os.environ["QUINTO_STYLE"] = styles.spec(QMD)  # the style of the deck, which style.py reads
 os.chdir(DIR)
 
 from quinto import *  # noqa: E402,F403
@@ -100,8 +101,9 @@ def meta_text(v):
 
 # ── slides ──────────────────────────────────────────────────────────────────
 
-LINE = 1.19  # line height in em, as in tohtml.py and slides.css
-BODY, QUESTION, TITLE, TABLE, TABLE_HEADER, ROW = 24, 36, 40, 28, 20, 0.6
+LINE = style.STYLE.LINE  # line height in em, as in tohtml.py
+BODY, QUESTION, TITLE = style.STYLE.BODY, style.STYLE.QUESTION, style.STYLE.TITLE
+TABLE, TABLE_HEADER, ROW = style.STYLE.TABLE, style.STYLE.TABLE_HEADER, style.STYLE.ROW
 ns = {"__name__": "__deck__"}
 cells = 0
 
@@ -281,5 +283,7 @@ def notes_html(text):
 style._notes.append(Keys)
 style.save(BASE + ".pptx")
 if os.environ.get("DECK_HTML"):  # for quinto.lua; the preview reads the notes from the .qmd itself
+    with open(os.path.join(os.environ["DECK_HTML"], "style.css"), "w") as f:
+        f.write(style.STYLE.CSS)
     with open(os.path.join(os.environ["DECK_HTML"], "notes.json"), "w") as f:
         json.dump({k: notes_html(qmd.notes(i) or "") for i, k in enumerate(keys)}, f)

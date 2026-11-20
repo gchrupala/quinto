@@ -76,6 +76,14 @@ class Qmd:
                 self.starts.append(i)
         self.end = len(self.lines)
 
+    def meta(self):
+        """The YAML header as a dict (empty without one)."""
+        import yaml
+        if self.lines[:1] != ["---"]:
+            return {}
+        end = next(i for i, line in enumerate(self.lines) if i > 0 and line in ("---", "..."))
+        return yaml.safe_load("\n".join(self.lines[1:end])) or {}
+
     def span(self, i):
         return self.starts[i], self.starts[i + 1] if i + 1 < len(self.starts) else self.end
 

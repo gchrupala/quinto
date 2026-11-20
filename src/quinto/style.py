@@ -1,6 +1,6 @@
-"""Helpers for the decks: a spare, mostly monochrome style in the manner of a LaTeX document.
+"""Helpers for drawing the slides of a deck, in the style it chooses (see styles/).
 
-Slides use the layouts of template.pptx (TITLE, TITLE_ONLY, BLANK). Text is native; lines, arrows and figures are drawn
+Slides use the layouts of the template of the style (TITLE, TITLE_ONLY, BLANK). Text is native; lines, arrows and figures are drawn
 with matplotlib in a lightly hand-drawn manner and placed as transparent PNGs at their final size,
 so that figure text has the same point size as slide text.
 """
@@ -17,30 +17,24 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch
 from PIL import ImageFont
 
-SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "template.pptx")
+from . import styles
+
+# The settings of the style of the deck (QUINTO_STYLE, set by build.py; see styles/__init__.py).
+STYLE = styles.load()
+SRC, W, H = STYLE.TEMPLATE, STYLE.W, STYLE.H
+INK, GREY, LIGHT = STYLE.INK, STYLE.GREY, STYLE.LIGHT
+ACCENT, ACCENT2, GREEN = STYLE.ACCENT, STYLE.ACCENT2, STYLE.GREEN
+SERIF, MONO, CJK = STYLE.SERIF, STYLE.MONO, STYLE.CJK
+SERIF_DIR, SERIF_FILES, EMOJI = STYLE.SERIF_DIR, STYLE.SERIF_FILES, STYLE.EMOJI
+NOTES_SIZE, NOTES_SPACE = STYLE.NOTES_SIZE, STYLE.NOTES_SPACE
+SKETCH = STYLE.SKETCH
+LATEX_PREAMBLE = STYLE.LATEX_PREAMBLE
+# part of every figure key, so that a change here or in the settings of the style redraws the figures
 with open(os.path.abspath(__file__), "rb") as _f:
-    STYLE_HASH = hashlib.md5(_f.read()).hexdigest()  # part of every figure key, so a change here redraws them
-NOTES_SIZE, NOTES_SPACE = 16, 5  # speaker notes: font size and space after each paragraph, in pt
+    STYLE_HASH = hashlib.md5(_f.read() + repr(sorted((n, v) for n, v in vars(STYLE).items()
+                                                      if n.isupper())).encode()).hexdigest()
 
-# Colour: ink and grey for almost everything; one accent for emphasis; a second only where a
-# visualization needs two contrasting categories.
-INK, GREY, LIGHT = "1A1A1A", "707070", "BDBDBD"
-ACCENT, ACCENT2 = "C0392B", "2E5C8A"  # vermilion; blue
-SERIF, MONO, CJK = "Libertinus Serif", "IBM Plex Mono", "Noto Serif CJK SC"
-SERIF_DIR = os.path.expanduser("~/.local/share/fonts/libertinus/")  # Google Fonts release
-SERIF_FILES = {(False, False): "LibertinusSerif-Regular.ttf", (False, True): "LibertinusSerif-Italic.ttf",
-               (True, False): "LibertinusSerif-Bold.ttf", (True, True): "LibertinusSerif-BoldItalic.ttf"}
-W, H = 11.02, 6.20
-SKETCH = (0.6, 70, 2.0)  # matplotlib sketch params: amplitude (px at 100 dpi), wavelength, randomness
-
-plt.rcParams.update({
-    "font.family": SERIF, "font.size": 20, "text.color": "#" + INK,
-    "axes.labelcolor": "#" + GREY, "xtick.color": "#" + GREY, "ytick.color": "#" + GREY,
-    "axes.edgecolor": "#" + INK, "axes.linewidth": 1.0,
-    "axes.spines.top": False, "axes.spines.right": False,
-    "xtick.labelsize": 18, "ytick.labelsize": 18, "axes.labelsize": 20,
-    "mathtext.fontset": "custom", "mathtext.rm": SERIF, "mathtext.it": SERIF + ":italic",
-})
+plt.rcParams.update(STYLE.RC)
 
 prs = Presentation(SRC)
 sldIdLst = prs.slides._sldIdLst
@@ -350,10 +344,7 @@ def pic(s, path, x, y, w=None, h=None):
                                 Inches(w) if w else None, Inches(h) if h else None)
 
 
-# formulas are set by LaTeX, in the Libertinus math fonts (needs a TeX installation with the libertinus,
-# libertinust1math and amsmath packages, and dvipng)
-LATEX_PREAMBLE = r"\usepackage{amsmath}\usepackage{libertinus}\usepackage{libertinust1math}"
-
+# formulas are set by LaTeX, with the preamble of the style (LATEX_PREAMBLE)
 
 def formula(s, tex, cx, cy, w, h=0.9, size=28, color=INK):
     """A formula set by LaTeX, centred at (cx, cy) in a picture of w × h inches. tex is LaTeX math between
@@ -365,9 +356,6 @@ def formula(s, tex, cx, cy, w, h=0.9, size=28, color=INK):
             ax.text(w / 2, h / 2, tex, ha="center", va="center", fontsize=size, color="#" + color)
             save_fig(fig, path)
     return pic(s, path, cx - w / 2, cy - h / 2, w, h)
-
-
-EMOJI = os.path.expanduser("~/.local/share/fonts/notoemoji/NotoEmoji.ttf")  # monochrome, Google Fonts
 
 
 def glyph(char, size=40, color=INK, font=EMOJI, w=None, white=False):
@@ -434,9 +422,6 @@ def save(path):
 
 
 # ── figures ─────────────────────────────────────────────────────────────────
-
-GREEN = "3A7D44"  # a third colour, only where three categories must be told apart
-
 
 def word_xs(widths, w):
     """Centres of words set side by side in columns of the given widths, centred in a width w."""
