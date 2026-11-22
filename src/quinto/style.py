@@ -9,6 +9,7 @@ from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
+from pptx.enum.shapes import PP_PLACEHOLDER
 from pptx.oxml.ns import qn
 from lxml import etree
 import matplotlib
@@ -396,6 +397,17 @@ def audio(s, path, cx, cy, size=40, color=INK):
 
 # ── saving ──────────────────────────────────────────────────────────────────
 
+def _drop_notes_numbers():
+    """Remove the slide-number placeholder from every notes page. The slide image on the page already
+    shows the number, and the placeholder of the notes master sits at the very bottom edge of the
+    page, where it is clipped in the PDF."""
+    for s in prs.slides:
+        ns = s.notes_slide  # created if missing, so that the page does not fall back to the master
+        for ph in list(ns.placeholders):
+            if ph.placeholder_format.type == PP_PLACEHOLDER.SLIDE_NUMBER:
+                ph._element.getparent().remove(ph._element)
+
+
 def save(path):
     """Save, and replace the template fonts in the theme and masters, so that placeholders and
     slide numbers use the serif too. With DECK_HTML set to a directory, write the HTML preview
@@ -405,6 +417,7 @@ def save(path):
         keys = _notes[-1].used if _notes else []
         tohtml.write(prs, os.environ["DECK_HTML"], keys, {"size": NOTES_SIZE, "space": NOTES_SPACE})
         return
+    _drop_notes_numbers()
     prs.save(path)
     tmp = path + ".tmp"
     with zipfile.ZipFile(path) as zin, zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as zout:
