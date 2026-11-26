@@ -361,6 +361,37 @@ def formula(s, tex, cx, cy, w, h=0.9, size=28, color=INK):
     return pic(s, path, cx - w / 2, cy - h / 2, w, h)
 
 
+def latex(s, tex, cx, cy, size=28):
+    """LaTeX in colour, set by pdflatex and centred at (cx, cy) in slide inches, at its natural size. tex is
+    the body of a document, in text mode: a formula is written between dollar signs. Beyond the preamble of
+    the style, the document has xcolor, with the colours of the style as ink, grey, light, accent, accent2
+    and green, and fancybox, whose \\ovalbox draws boxes with rounded corners. Unlike formula(), which
+    draws a formula in one colour, it can colour parts differently, for example boxes and labels in grey
+    around a formula in ink. Needs pdflatex and pdftocairo."""
+    import subprocess, tempfile
+    from PIL import Image
+    colors = dict(ink=INK, grey=GREY, light=LIGHT, accent=ACCENT, accent2=ACCENT2, green=GREEN)
+    doc = (r"\documentclass[border=4pt]{standalone}" + LATEX_PREAMBLE + r"\usepackage{fancybox}\usepackage{xcolor}"
+           + "".join(rf"\definecolor{{{n}}}{{HTML}}{{{c}}}" for n, c in colors.items())
+           + rf"\begin{{document}}\fontsize{{{size}}}{{{1.2 * size:.0f}}}\selectfont\color{{ink}}"
+           + tex + r"\end{document}")
+    path = fig_path("latex", (doc,))
+    if not os.path.exists(path):
+        with tempfile.TemporaryDirectory() as tmp:
+            with open(os.path.join(tmp, "f.tex"), "w") as f:
+                f.write(doc)
+            r = subprocess.run(["pdflatex", "-interaction=nonstopmode", "-halt-on-error", "f.tex"], cwd=tmp,
+                               capture_output=True, text=True)
+            if r.returncode:
+                raise RuntimeError("pdflatex failed:\n" + "\n".join(r.stdout.splitlines()[-15:]))
+            subprocess.run(["pdftocairo", "-png", "-r", "300", "-transp", "-singlefile", "f.pdf", "f"], cwd=tmp,
+                           check=True, capture_output=True)
+            os.replace(os.path.join(tmp, "f.png"), path)
+    with Image.open(path) as im:
+        w, h = (v / 300 for v in im.size)
+    return pic(s, path, cx - w / 2, cy - h / 2, w, h)
+
+
 def glyph(char, size=40, color=INK, font=EMOJI, w=None, white=False):
     """A PNG of a monochrome emoji, or a short text in another font file, d inches high and w wide.
     white: on a white background instead of a transparent one. Returns the path, w and d."""

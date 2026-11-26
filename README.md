@@ -33,7 +33,7 @@ Other requirements:
   - Libertinus Serif (all text), IBM Plex Mono (code) and the monochrome Noto Emoji (icons): `quinto install-fonts` downloads them from Google Fonts to `~/.local/share/fonts/libertinus/`, `~/.local/share/fonts/ibmplexmono/` and `~/.local/share/fonts/notoemoji/NotoEmoji.ttf`. Quinto reads Libertinus Serif and Noto Emoji from these paths to measure text and draw figures.
   - Noto Serif CJK SC, for Chinese: Debian/Ubuntu package `fonts-noto-cjk`.
   - The .pptx only names the fonts, so LibreOffice or PowerPoint substitutes another font, without a warning, for any font that is missing. `quinto render` and `quinto pdf` therefore stop if a font is missing.
-- Formulas (`formula()` in `style.py`) are set by LaTeX through matplotlib, with the preamble of the style. zeroclutter uses the Libertinus math fonts, which need a TeX installation with `latex`, `dvipng` and the packages amsmath, libertinus and libertinust1math (on Debian/Ubuntu: `texlive-latex-extra`, `texlive-fonts-extra`, `dvipng`).
+- Formulas (`formula()` in `style.py`) are set by LaTeX through matplotlib, with the preamble of the style. zeroclutter uses the Libertinus math fonts, which need a TeX installation with `latex`, `dvipng` and the packages amsmath, libertinus and libertinust1math (on Debian/Ubuntu: `texlive-latex-extra`, `texlive-fonts-extra`, `dvipng`). LaTeX in several colours (`latex()`) is set by `pdflatex` instead, with the packages xcolor and fancybox, and converted to PNG by `pdftocairo` (package `poppler-utils`).
 - To check the real deck and export PDFs in LibreOffice (`quinto render`, `quinto pdf`): LibreOffice (`soffice`) and `pdftoppm` (package `poppler-utils`). Screenshots of the preview (`quinto shot`) need Google Chrome or Chromium.
 
 ## Commands
