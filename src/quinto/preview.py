@@ -63,6 +63,7 @@ body.grid .wrap.current { outline: 3px solid #2e5c8a; }
 .notes p { margin: 0; }
 .notes .mark { display: inline-block; text-indent: 0; }
 .notes .code { font-family: "Latin Modern Mono", monospace; }
+.notes sup, .notes sub { line-height: 0; }
 .notes.overflow { outline: 2px solid #c0392b; outline-offset: 2px; }
 #editor { display: none; flex: 0 0 min(40vw, 640px); }
 body.editing:not(.grid) #editor { display: block; }

@@ -61,7 +61,7 @@ def text_width(text, size, bold=False, italic=False):
 
 # ── text ────────────────────────────────────────────────────────────────────
 
-def style_run(run, size, color=INK, bold=False, italic=False, font=SERIF, sup=False):
+def style_run(run, size, color=INK, bold=False, italic=False, font=SERIF, sup=False, sub=False):
     f = run.font
     f.size = Pt(size)
     f.bold = bold
@@ -77,6 +77,8 @@ def style_run(run, size, color=INK, bold=False, italic=False, font=SERIF, sup=Fa
         rPr.find(qn("a:latin")).set("typeface", CJK)
     if sup:
         rPr.set("baseline", "30000")
+    if sub:
+        rPr.set("baseline", "-25000")
 
 
 def fill_text(tf, paras, size, color=INK, bold=False, italic=False, align="l",
@@ -152,7 +154,7 @@ def notes(s, text):
             r = p.add_run()
             r.text = text
             style_run(r, NOTES_SIZE, "000000", bold=f.get("bold", False), italic=f.get("italic", False),
-                      font=MONO if f.get("code") else SERIF)
+                      font=MONO if f.get("code") else SERIF, sup=f.get("sup", False), sub=f.get("sub", False))
             if f.get("link"):
                 r.hyperlink.address = f["link"]
 

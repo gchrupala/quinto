@@ -1,7 +1,8 @@
 """Speaker notes in Markdown, rendered in the same way in the .pptx and in HTML.
 
 The notes of a slide are Markdown (CommonMark): paragraphs separated by blank lines, *italics*,
-**bold**, `code`, [links](https://...), lists, headings and code blocks. Raw HTML is shown as text.
+**bold**, `code`, [links](https://...), lists, headings and code blocks, and, as in Pandoc,
+superscripts and subscripts without spaces: W^Q^, d~k~. Raw HTML is shown as text.
 In a deck they are the ::: notes block of each slide (see qmdfile.py).
 
 paragraphs() turns the Markdown of one slide into the paragraphs of the notes, so that the .pptx
@@ -9,17 +10,19 @@ paragraphs() turns the Markdown of one slide into the paragraphs of the notes, s
 notes in the same way.
 """
 import html
+import re
 
 from markdown_it import MarkdownIt
 
 MD = MarkdownIt("commonmark", {"html": False})
+SUPSUB = re.compile(r"\^([^\s^]+)\^|~([^\s~]+)~")  # Pandoc: ^superscript^, ~subscript~, without spaces
 
 
 def paragraphs(text):
     """The paragraphs of a section in Markdown. Each is a dict:
     level: list nesting depth (0 outside lists); mark: "•" or "3." on the first paragraph of a list
-    item, else None; runs: list of (text, fmt), fmt a dict with any of italic, bold, code (True)
-    and link (the address); a run with text "\\n" is a line break."""
+    item, else None; runs: list of (text, fmt), fmt a dict with any of italic, bold, code, sup, sub
+    (True) and link (the address); a run with text "\\n" is a line break."""
     out, lists, mark, quote = [], [], None, 0
     fmt = {}
     tokens = MD.parse(text)
@@ -59,7 +62,7 @@ def _runs(children, base):
     runs, f = [], dict(base)
     for c in children:
         if c.type == "text":
-            runs.append((c.content, dict(f)))
+            runs += _supsub(c.content, f)
         elif c.type == "softbreak":
             runs.append((" ", dict(f)))
         elif c.type == "hardbreak":
@@ -90,6 +93,19 @@ def _runs(children, base):
     return merged
 
 
+def _supsub(text, f):
+    """Runs of a text, with ^superscripts^ and ~subscripts~ as runs of their own."""
+    runs, pos = [], 0
+    for m in SUPSUB.finditer(text):
+        if m.start() > pos:
+            runs.append((text[pos:m.start()], dict(f)))
+        runs.append((m.group(1), dict(f, sup=True)) if m.group(1) else (m.group(2), dict(f, sub=True)))
+        pos = m.end()
+    if pos < len(text):
+        runs.append((text[pos:], dict(f)))
+    return runs
+
+
 def to_html(text):
     """The paragraphs of a section as [{level, mark, html}], html being the inline content."""
     out = []
@@ -102,6 +118,10 @@ def to_html(text):
             s = html.escape(t, quote=False)
             if f.get("code"):
                 s = f'<span class="code">{s}</span>'
+            if f.get("sup"):
+                s = f"<sup>{s}</sup>"
+            if f.get("sub"):
+                s = f"<sub>{s}</sub>"
             if f.get("italic"):
                 s = f"<i>{s}</i>"
             if f.get("bold"):
