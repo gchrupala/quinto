@@ -11,7 +11,7 @@ Importing another module of the package, such as quinto.qmdfile, does not import
 """
 import functools, sys
 
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 
 
 @functools.lru_cache(maxsize=None)
