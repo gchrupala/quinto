@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "quinto"
-version = "0.2.3"
+version = "0.2.4"
 description = "Slide decks written in Quarto, drawn in Python, built as .pptx, with a live preview and a reveal.js version"
 readme = "README.md"
 license = "MIT"

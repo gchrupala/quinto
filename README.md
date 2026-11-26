@@ -20,8 +20,8 @@ In the code, a style is a module of settings in `src/quinto/styles/`: colours, f
 Quinto has two parts: a Python package, which builds the decks, and a Quarto extension, which lets Quarto present them with reveal.js.
 
 ```sh
-pip install git+https://github.com/gchrupala/quinto@v0.2.3   # the package and the quinto command
-quarto add gchrupala/quinto@v0.2.3                            # the extension, run in the directory of the decks
+pip install git+https://github.com/gchrupala/quinto@v0.2.4   # the package and the quinto command
+quarto add gchrupala/quinto@v0.2.4                            # the extension, run in the directory of the decks
 ```
 
 `quarto add` copies the extension to `_extensions/quinto/`, which is meant to be committed with the decks. Install the same version of both.
