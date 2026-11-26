@@ -64,7 +64,6 @@ body.grid .wrap.current { outline: 3px solid #2e5c8a; }
 .notes .mark { display: inline-block; text-indent: 0; }
 .notes .code { font-family: "Latin Modern Mono", monospace; }
 .notes.overflow { outline: 2px solid #c0392b; outline-offset: 2px; }
-.pageno { position: absolute; font-size: 14pt; text-align: right; }
 #editor { display: none; flex: 0 0 min(40vw, 640px); }
 body.editing:not(.grid) #editor { display: block; }
 #editor textarea { box-sizing: border-box; width: 100%%; height: calc(100vh - 100px); padding: 10px;
@@ -140,8 +139,7 @@ function pageHTML(i) {
     `<div class="frame" style="left:${ix}pt;top:${iy}pt;width:${iw}pt;height:${ih}pt">` +
     `<div class="slide" style="width:${s.size[0]}pt;height:${s.size[1]}pt;transform:scale(${k})">${sl.html}</div></div>` +
     `<div class="notes" style="left:${bx}pt;top:${by}pt;width:${bw}pt;height:${bh}pt;` +
-    `padding:${pt_}pt ${pr}pt ${pb}pt ${pl}pt;font-size:${g.size}pt"><div class="ntext">${paras}</div></div>` +
-    `<div class="pageno" style="left:${pw - 130}pt;top:${ph - 30}pt;width:120pt">${i + 1}</div></div>`;
+    `padding:${pt_}pt ${pr}pt ${pb}pt ${pl}pt;font-size:${g.size}pt"><div class="ntext">${paras}</div></div></div>`;
 }
 function render() {
   const s = state;
