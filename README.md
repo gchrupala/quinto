@@ -121,7 +121,7 @@ Figures are cached in `_quinto/fig/`. A figure is drawn again only when its inpu
 
 ## Development
 
-Install a clone in editable mode (`pip install -e .`), so that the preview picks up changes to the modules. After a change to `_extensions/quinto/`, run `quarto update` in the directory of the decks (or copy the files) to update their copy of the extension.
+Install a clone in editable mode (`pip install -e .`), so that the preview picks up changes to the modules. The tests (`tests/`, property-based with Hypothesis) run with `pip install -e '.[test]'` and `python -m pytest`. After a change to `_extensions/quinto/`, run `quarto update` in the directory of the decks (or copy the files) to update their copy of the extension.
 
 ## Licence
 

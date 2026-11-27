@@ -22,6 +22,7 @@ dependencies = [
 
 [project.optional-dependencies]
 quarto = ["quarto-cli"]
+test = ["pytest", "hypothesis"]
 
 [project.scripts]
 quinto = "quinto.cli:main"
