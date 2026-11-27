@@ -28,7 +28,11 @@ def paragraphs(text):
     tokens = MD.parse(text)
     for i, t in enumerate(tokens):
         if t.type in ("bullet_list_open", "ordered_list_open"):
-            start = int(t.attrGet("start") or 1) if t.type == "ordered_list_open" else None
+            if t.type == "ordered_list_open":  # no start attribute: from 1; it can be 0
+                start = t.attrGet("start")
+                start = 1 if start is None else int(start)
+            else:
+                start = None
             lists.append(start)
         elif t.type in ("bullet_list_close", "ordered_list_close"):
             lists.pop()
